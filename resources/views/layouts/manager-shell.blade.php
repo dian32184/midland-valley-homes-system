@@ -25,6 +25,7 @@
             gap: 10px;
         }
         .brand { border-radius: var(--radius); background: #ffffffd9; border: 1px solid #e2e8f0; padding: 10px; text-align: center; }
+        .brand img { height: 48px; width: auto; border-radius: 8px; margin-left: 50px; }
         .brand h1 { margin: 8px 0 0; font-size: 14px; font-weight: 700; color: #1e293b; }
         .menu { display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
         .menu a {
@@ -165,27 +166,49 @@
 </head>
 <body>
 @php
-    $sidebarModules = $sidebarModules ?? [
-        ['label' => 'Dashboard', 'route' => 'managerdashboard'],
-        ['label' => 'Customers', 'route' => 'customers.index'],
-        ['label' => 'Properties', 'route' => 'properties.index'],
-        ['label' => 'Reservations', 'route' => 'reservations.index'],
-        ['label' => 'Payments', 'route' => 'payments.index'],
-        ['label' => 'Documents', 'route' => 'documents.index'],
-        ['label' => 'Title Transfers', 'route' => 'title-transfers.index'],
-        ['label' => 'Construction', 'route' => 'construction-projects.index'],
-        ['label' => 'Employees', 'route' => 'employees.index'],
-        ['label' => 'Attendance', 'route' => 'attendance-records.index'],
-        ['label' => 'Payroll', 'route' => 'payrolls.index'],
-        ['label' => 'Benefits', 'route' => 'benefits.index'],
-        ['label' => 'Reports', 'route' => 'reports.index'],
-    ];
+    if (!isset($sidebarModules)) {
+        $user = auth()->user();
+        $role = $user->role ?? 'marketing';
+        $email = strtolower((string) ($user->email ?? ''));
+        $isAdmin = $role === 'admin' || str_contains($email, 'admin@');
+
+        if ($isAdmin) {
+            $sidebarModules = [
+                ['label' => 'Dashboard', 'route' => 'admindashboard'],
+                ['label' => 'Customers', 'route' => 'customers.index'],
+                ['label' => 'Properties', 'route' => 'properties.index'],
+                ['label' => 'Reservations', 'route' => 'reservations.index'],
+                ['label' => 'Payments', 'route' => 'payments.index'],
+                ['label' => 'Employees', 'route' => 'employees.index'],
+                ['label' => 'Attendance', 'route' => 'attendance-records.index'],
+                ['label' => 'Payroll', 'route' => 'payrolls.index'],
+                ['label' => 'Benefits', 'route' => 'benefits.index'],
+                ['label' => 'Reports', 'route' => 'reports.index'],
+            ];
+        } else {
+            $sidebarModules = [
+                ['label' => 'Dashboard', 'route' => 'managerdashboard'],
+                ['label' => 'Customers', 'route' => 'customers.index'],
+                ['label' => 'Properties', 'route' => 'properties.index'],
+                ['label' => 'Reservations', 'route' => 'reservations.index'],
+                ['label' => 'Payments', 'route' => 'payments.index'],
+                ['label' => 'Documents', 'route' => 'documents.index'],
+                ['label' => 'Title Transfers', 'route' => 'title-transfers.index'],
+                ['label' => 'Construction', 'route' => 'construction-projects.index'],
+                ['label' => 'Employees', 'route' => 'employees.index'],
+                ['label' => 'Attendance', 'route' => 'attendance-records.index'],
+                ['label' => 'Payroll', 'route' => 'payrolls.index'],
+                ['label' => 'Benefits', 'route' => 'benefits.index'],
+                ['label' => 'Reports', 'route' => 'reports.index'],
+            ];
+        }
+    }
 @endphp
 
 <div class="shell">
     <aside class="sidebar">
         <div class="brand">
-            <x-application-logo class="block h-12 w-auto mx-auto text-indigo-700" />
+            <img src="{{ asset('images/midland.jpg') }}" alt="Midland Valley Homes Logo">
             <h1>Midland Valley Homes</h1>
         </div>
         <nav class="menu">
