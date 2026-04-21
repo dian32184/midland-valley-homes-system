@@ -20,7 +20,33 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        $role = $user->role ?? 'marketing';
+        $email = strtolower((string) ($user->email ?? ''));
+
+        if ($role === 'documentation' || str_contains($email, 'docs@') || str_contains($email, 'documentation@')) {
+            return redirect()->route('documentationdashboard');
+        }
+
+        if ($role === 'manager' || str_contains($email, 'manager@')) {
+            return redirect()->route('managerdashboard');
+        }
+
+        if ($role === 'admin' || str_contains($email, 'admin@')) {
+            return redirect()->route('admindashboard');
+        }
+
+        return redirect()->route('marketingdashboard');
+    })->name('dashboard');
+
     Route::get('/managerdashboard', function () {
+        $user = auth()->user();
+        $role = $user->role ?? 'marketing';
+        $email = strtolower((string) ($user->email ?? ''));
+
+        abort_unless($role === 'manager' || str_contains($email, 'manager@'), 403);
+
         return view('managerdashboard');
     })->name('managerdashboard');
 
