@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConstructionProject;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ConstructionProjectController extends Controller
 {
@@ -11,7 +13,9 @@ class ConstructionProjectController extends Controller
      */
     public function index()
     {
-        //
+        $constructionProjects = ConstructionProject::with('property')->orderByDesc('created_at')->paginate(12);
+
+        return view('construction-projects.index', compact('constructionProjects'));
     }
 
     /**
@@ -27,7 +31,22 @@ class ConstructionProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'property_id' => ['required', 'exists:properties,id'],
+            'status' => ['required', Rule::in(['not_started', 'ongoing', 'completed'])],
+            'start_date' => ['nullable', 'date'],
+            'completion_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'progress_percent' => ['nullable', 'integer', 'between:0,100'],
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        $validated['progress_percent'] = $validated['progress_percent'] ?? 0;
+
+        ConstructionProject::create($validated);
+
+        return redirect()
+            ->route('construction-projects.index')
+            ->with('status', 'Construction project added successfully.');
     }
 
     /**

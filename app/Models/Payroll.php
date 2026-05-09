@@ -19,8 +19,19 @@ class Payroll extends Model
         'payroll_type',
         'status',
         'paid_at',
+        'approved_at',
         'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'period_start_date' => 'date',
+            'period_end_date' => 'date',
+            'paid_at' => 'date',
+            'approved_at' => 'date',
+        ];
+    }
 
     public function employee()
     {

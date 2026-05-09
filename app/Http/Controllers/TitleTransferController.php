@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TitleTransfer;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TitleTransferController extends Controller
 {
@@ -11,7 +13,9 @@ class TitleTransferController extends Controller
      */
     public function index()
     {
-        //
+        $titleTransfers = TitleTransfer::with(['customer', 'property'])->orderByDesc('created_at')->paginate(12);
+
+        return view('title-transfers.index', compact('titleTransfers'));
     }
 
     /**
@@ -27,7 +31,22 @@ class TitleTransferController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'customer_id' => ['required', 'exists:customers,id'],
+            'property_id' => ['nullable', 'exists:properties,id'],
+            'status' => ['required', Rule::in(['pending', 'submitted_to_bir', 'car_issued', 'registered', 'tct_issued', 'rejected'])],
+            'submitted_to_bir_at' => ['nullable', 'date'],
+            'car_issued_at' => ['nullable', 'date'],
+            'registered_at' => ['nullable', 'date'],
+            'tct_issued_at' => ['nullable', 'date'],
+            'remarks' => ['nullable', 'string'],
+        ]);
+
+        TitleTransfer::create($validated);
+
+        return redirect()
+            ->route('title-transfers.index')
+            ->with('status', 'Title transfer record added successfully.');
     }
 
     /**

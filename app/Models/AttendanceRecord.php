@@ -19,6 +19,11 @@ class AttendanceRecord extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'attendance_date' => 'date:Y-m-d',
+        'hours_worked'    => 'float',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
